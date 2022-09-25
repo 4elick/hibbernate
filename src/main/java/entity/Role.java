@@ -27,4 +27,9 @@ public class Role {
     @OneToMany(mappedBy = "role",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     private List<Employee> employees = new ArrayList<Employee>();
 
+    public Role(String nameRole,Date date){
+        this.nameRole = nameRole;
+        this.createDate = date;
+    }
+
 }

@@ -2,10 +2,10 @@ package service;
 
 import dao.CustomizedEmployeesCrudRepository;
 import entity.Employee;
+import entity.Role;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.test.annotation.Commit;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -16,6 +16,16 @@ import java.util.Optional;
 public class EmployeeDataService{
     @Autowired
     CustomizedEmployeesCrudRepository employeesCrudRepository;
+
+    public Employee findByRole(Role role){
+        try {
+           Employee employee = employeesCrudRepository.findByRole(role);
+           return employee;
+        }catch (HibernateException e){
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     @Transactional
     public void save(Employee employee){
