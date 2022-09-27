@@ -3,8 +3,8 @@ package service;
 import dao.CustomizedEmployeesCrudRepository;
 import entity.Employee;
 import entity.Role;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.HibernateException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -13,9 +13,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class EmployeeDataService{
-    @Autowired
-    CustomizedEmployeesCrudRepository employeesCrudRepository;
+
+    private final CustomizedEmployeesCrudRepository employeesCrudRepository;
+
 
     public Employee findByRole(Role role){
         try {
