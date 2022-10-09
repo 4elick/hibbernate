@@ -1,10 +1,12 @@
-package service;
+package app.service;
 
-import dao.CustomizedEmployeesCrudRepository;
-import entity.Employee;
-import entity.Role;
+import app.dao.CustomizedEmployeesCrudRepository;
+import app.dao.CustomizedRolesCrudRepository;
+import app.entity.Employee;
+import app.entity.Role;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.HibernateException;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -17,32 +19,61 @@ import java.util.Optional;
 public class EmployeeDataService{
 
     private final CustomizedEmployeesCrudRepository employeesCrudRepository;
-
-
-    public Employee findByRole(Role role){
+    private final CustomizedRolesCrudRepository rolesCrudRepository;
+    /*
+    public List<Employee> findByRole(Role role){
         try {
-           Employee employee = employeesCrudRepository.findByRole(role);
-           return employee;
+           List<Employee> employees = employeesCrudRepository.findAllByRole(role);
+           return employees;
         }catch (HibernateException e){
             e.printStackTrace();
             return null;
         }
     }
-
+    */
     @Transactional
     public void save(Employee employee){
         try {
+            Role role = rolesCrudRepository.findById(employee.getRole().getId()).get();
+            employee.setRole(role);
             employeesCrudRepository.save(employee);
+
         } catch (HibernateException e){
+            e.printStackTrace();
+
+        }
+    }
+    @Transactional
+    public void updateEmployee(long id,Employee employee){
+        try {
+            if(!employeesCrudRepository.existsById(id)){
+                throw new ChangeSetPersister.NotFoundException();
+            }
+            Employee employee1 = employeesCrudRepository.findById(id).get();
+            employee1.setName(employee.getName());
+            employee1.setFatherName(employee.getFatherName());
+            employee1.setSecondName(employee.getSecondName());
+            if(rolesCrudRepository.existsById(employee.getRole().getId())) {
+                Role role = rolesCrudRepository.findById(employee.getRole().getId()).get();
+                employee.setRole(role);
+                role.getEmployees().add(employee1);
+            } else {
+
+                employee1.setRole(employee.getRole());
+            }
+            employeesCrudRepository.save(employee1);
+
+        }catch (HibernateException e){
+            e.printStackTrace();
+        } catch (ChangeSetPersister.NotFoundException e) {
             e.printStackTrace();
         }
     }
     @Transactional
     public Employee findById(long id){
         try {
-            Optional<Employee> employee = employeesCrudRepository.findById(id);
-            Employee result = employee.get();
-            return result;
+            Employee employee = employeesCrudRepository.findById(id).get();
+            return employee;
         }catch (HibernateException e){
             e.printStackTrace();
             return null;
@@ -82,5 +113,6 @@ public class EmployeeDataService{
             e.printStackTrace();
         }
     }
+
 
 }

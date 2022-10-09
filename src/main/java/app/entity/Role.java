@@ -1,17 +1,18 @@
-package entity;
+package app.entity;
 
-import lombok.Builder;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = Long.class)
 @Entity
 @NoArgsConstructor
 @Getter
@@ -24,7 +25,8 @@ public class Role {
     private String nameRole;
     @Temporal(TemporalType.TIMESTAMP)
     private Date createDate;
-    @OneToMany(mappedBy = "role",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    /*@JsonIdentityReference(alwaysAsId = true)*/
+    @OneToMany(mappedBy = "role",cascade = CascadeType.ALL)
     private List<Employee> employees = new ArrayList<Employee>();
 
     public Role(String nameRole,Date date){
