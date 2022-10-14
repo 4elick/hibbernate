@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = Long.class)
+@Table(name = "roles")
 @Entity
 @NoArgsConstructor
 @Getter
@@ -26,7 +27,7 @@ public class Role {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createDate;
     /*@JsonIdentityReference(alwaysAsId = true)*/
-    @OneToMany(mappedBy = "role",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "role",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     private List<Employee> employees = new ArrayList<Employee>();
 
     public Role(String nameRole,Date date){

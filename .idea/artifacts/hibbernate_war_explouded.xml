@@ -1,0 +1,6 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="hibbernate:war-explouded">
+    <output-path>$PROJECT_DIR$/out/artifacts/hibbernate_war_explouded</output-path>
+    <root id="root" />
+  </artifact>
+</component>

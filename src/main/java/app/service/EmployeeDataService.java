@@ -34,8 +34,16 @@ public class EmployeeDataService{
     @Transactional
     public void save(Employee employee){
         try {
-            Role role = rolesCrudRepository.findById(employee.getRole().getId()).get();
-            employee.setRole(role);
+
+            if(rolesCrudRepository.existsById(employee.getRole().getId())) {
+                Role role = rolesCrudRepository.findById(employee.getRole().getId()).get();
+                employee.setRole(role);
+                role.getEmployees().add(employee);
+            } else {
+                Role role = employee.getRole();
+                role.getEmployees().add(employee);
+                employee.setRole(role);
+            }
             employeesCrudRepository.save(employee);
 
         } catch (HibernateException e){
@@ -58,7 +66,6 @@ public class EmployeeDataService{
                 employee.setRole(role);
                 role.getEmployees().add(employee1);
             } else {
-
                 employee1.setRole(employee.getRole());
             }
             employeesCrudRepository.save(employee1);

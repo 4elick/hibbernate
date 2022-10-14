@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.5.xsd">
+    <changeSet id="5" author="klima">
+        <addForeignKeyConstraint baseColumnNames="role_id"
+                                 baseTableName="employees"
+                                 constraintName="FK_Employee_ON_ROLE"
+                                 referencedColumnNames="id"
+                                 referencedTableName="roles"/>
+
+        <addForeignKeyConstraint baseColumnNames="card_account_id"
+                                 baseTableName="cards"
+                                 constraintName="FK_CARDS_ON_CARDACCOUNT"
+                                 referencedColumnNames="id"
+                                 referencedTableName="card_accounts"/>
+    </changeSet>
+
+</databaseChangeLog>

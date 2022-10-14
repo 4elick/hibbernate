@@ -6,7 +6,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
-
+@Table(name = "cards")
 @Entity
 @NoArgsConstructor
 @Getter
