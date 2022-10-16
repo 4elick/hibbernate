@@ -23,8 +23,8 @@ public class CardAccount {
     private String value;
     @Enumerated(EnumType.STRING)
     private Status status;
-    @ManyToOne(targetEntity = Employee.class,fetch = FetchType.LAZY,optional = false)
+    @ManyToOne(targetEntity = Employee.class,optional = false)
     private Employee employee;
-    @OneToMany(targetEntity = Card.class,mappedBy = "cardAccount",fetch = FetchType.LAZY)
+    @OneToMany(targetEntity = Card.class,mappedBy = "cardAccount")
     private List<Card> cards = new ArrayList<Card>();
 }

@@ -27,19 +27,19 @@ public class EmployeeController {
         return employeeDataService.findById(id);
     }
 
-    @PostMapping(path = "/add",produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public void addEmployee(@RequestBody Employee employee){
         employeeDataService.save(employee);
     }
 
-    @DeleteMapping(path = "/delete/{id}",produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(path = "/{id}",produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteEmployee(@PathVariable long id){
-        employeeDataService.delete(employeeDataService.findById(id));
+        employeeDataService.delete(id);
     }
 
-    @PutMapping(path = "/update/{id}",produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = "/{id}",produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public void updateEmployee(@PathVariable long id,@RequestBody Employee employee){
         employeeDataService.updateEmployee(id,employee);

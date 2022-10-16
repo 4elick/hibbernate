@@ -1,7 +1,7 @@
 package app.service;
 
-import app.dao.CustomizedEmployeesCrudRepository;
-import app.dao.CustomizedRolesCrudRepository;
+import app.dao.EmployeesCrudRepository;
+import app.dao.RolesCrudRepository;
 import app.entity.Employee;
 import app.entity.Role;
 import lombok.RequiredArgsConstructor;
@@ -12,14 +12,13 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class EmployeeDataService{
 
-    private final CustomizedEmployeesCrudRepository employeesCrudRepository;
-    private final CustomizedRolesCrudRepository rolesCrudRepository;
+    private final EmployeesCrudRepository employeesCrudRepository;
+    private final RolesCrudRepository rolesCrudRepository;
     /*
     public List<Employee> findByRole(Role role){
         try {
@@ -79,9 +78,15 @@ public class EmployeeDataService{
     @Transactional
     public Employee findById(long id){
         try {
+            if(!employeesCrudRepository.existsById(id)){
+                throw new ChangeSetPersister.NotFoundException();
+            }
             Employee employee = employeesCrudRepository.findById(id).get();
             return employee;
         }catch (HibernateException e){
+            e.printStackTrace();
+            return null;
+        } catch (ChangeSetPersister.NotFoundException e) {
             e.printStackTrace();
             return null;
         }
@@ -104,9 +109,9 @@ public class EmployeeDataService{
         }
     }
     @Transactional
-    public void delete(Employee employee){
+    public void delete(long id){
         try {
-            employeesCrudRepository.delete(employee);
+            employeesCrudRepository.deleteById(id);
         }catch (HibernateException e){
             e.printStackTrace();
         }

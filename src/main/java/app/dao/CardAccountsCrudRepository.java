@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CustomizedCardAccountsCrudRepository extends JpaRepository<CardAccount, Long> {
+public interface CardAccountsCrudRepository extends JpaRepository<CardAccount, Long> {
  /*   List<CardAccount> getAllByEmployee(Employee employee);*/
 }
