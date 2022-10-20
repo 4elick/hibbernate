@@ -2,8 +2,10 @@ package app.service;
 
 import app.dao.EmployeesCrudRepository;
 import app.dao.RolesCrudRepository;
+import app.dto.EmployeeDTO;
 import app.entity.Employee;
 import app.entity.Role;
+import app.mapping.MappingEntity;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.HibernateException;
 import org.springframework.data.crossstore.ChangeSetPersister;
@@ -16,7 +18,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class EmployeeDataService{
-
+    private final MappingEntity mappingEntity;
     private final EmployeesCrudRepository employeesCrudRepository;
     private final RolesCrudRepository rolesCrudRepository;
     /*
@@ -34,6 +36,10 @@ public class EmployeeDataService{
     public void save(Employee employee){
         try {
 
+            if(employeesCrudRepository.existsById(employee.getId())){
+                throw new ChangeSetPersister.NotFoundException();
+            }
+
             if(rolesCrudRepository.existsById(employee.getRole().getId())) {
                 Role role = rolesCrudRepository.findById(employee.getRole().getId()).get();
                 employee.setRole(role);
@@ -48,6 +54,8 @@ public class EmployeeDataService{
         } catch (HibernateException e){
             e.printStackTrace();
 
+        } catch (ChangeSetPersister.NotFoundException e) {
+            System.out.println("This employee is already exist");
         }
     }
     @Transactional
@@ -56,10 +64,12 @@ public class EmployeeDataService{
             if(!employeesCrudRepository.existsById(id)){
                 throw new ChangeSetPersister.NotFoundException();
             }
+
             Employee employee1 = employeesCrudRepository.findById(id).get();
             employee1.setName(employee.getName());
             employee1.setFatherName(employee.getFatherName());
             employee1.setSecondName(employee.getSecondName());
+
             if(rolesCrudRepository.existsById(employee.getRole().getId())) {
                 Role role = rolesCrudRepository.findById(employee.getRole().getId()).get();
                 employee.setRole(role);
@@ -76,13 +86,14 @@ public class EmployeeDataService{
         }
     }
     @Transactional
-    public Employee findById(long id){
+    public EmployeeDTO findById(long id){
         try {
             if(!employeesCrudRepository.existsById(id)){
                 throw new ChangeSetPersister.NotFoundException();
             }
             Employee employee = employeesCrudRepository.findById(id).get();
-            return employee;
+            EmployeeDTO employeeDTO = mappingEntity.convertToEmployeeDTO(employee);
+            return employeeDTO;
         }catch (HibernateException e){
             e.printStackTrace();
             return null;

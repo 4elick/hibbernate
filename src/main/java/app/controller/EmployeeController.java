@@ -1,5 +1,6 @@
 package app.controller;
 
+import app.dto.EmployeeDTO;
 import app.entity.CardAccount;
 import app.entity.Employee;
 import app.entity.Role;
@@ -23,7 +24,7 @@ public class EmployeeController {
 
     @GetMapping(path = "/{id}",produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public Employee getEmployee(@PathVariable long id){
+    public EmployeeDTO getEmployee(@PathVariable long id){
         return employeeDataService.findById(id);
     }
 
