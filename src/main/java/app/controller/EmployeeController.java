@@ -1,19 +1,12 @@
 package app.controller;
 
 import app.dto.EmployeeDTO;
-import app.entity.CardAccount;
-import app.entity.Employee;
-import app.entity.Role;
-import app.entity.Status;
+import com.fasterxml.jackson.annotation.JsonView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import app.service.EmployeeDataService;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,16 +14,17 @@ import java.util.List;
 public class EmployeeController {
 
     private final EmployeeDataService employeeDataService;
-
+    @JsonView(EmployeeDTO.Response.class)
     @GetMapping(path = "/{id}",produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public EmployeeDTO getEmployee(@PathVariable long id){
         return employeeDataService.findById(id);
     }
 
+    @JsonView(EmployeeDTO.Request.class)
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public void addEmployee(@RequestBody Employee employee){
+    public void addEmployee(@RequestBody EmployeeDTO employee){
         employeeDataService.save(employee);
     }
 
@@ -42,7 +36,7 @@ public class EmployeeController {
 
     @PutMapping(path = "/{id}",produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public void updateEmployee(@PathVariable long id,@RequestBody Employee employee){
+    public void updateEmployee(@PathVariable long id,@RequestBody EmployeeDTO employee){
         employeeDataService.updateEmployee(id,employee);
     }
 

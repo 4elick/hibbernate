@@ -1,30 +1,63 @@
 package app.dto;
 
-import app.entity.Employee;
 import app.entity.Status;
 import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import java.util.Date;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 public class EmployeeDTO {
+
+    public interface Request {
+
+    }
+
+    public interface Response{
+
+    }
+
+    @JsonView(Response.class)
+    @Null(groups = {Request.class})
+    @NotNull(groups = {Response.class})
     long id;
+    @JsonView({Response.class, Request.class})
+    @NotNull(groups = {Response.class, Request.class})
     String name;
+    @JsonView({Response.class, Request.class})
+    @NotNull(groups = {Response.class, Request.class})
     String secondName;
+    @JsonView({Response.class, Request.class})
+    @NotNull(groups = {Response.class, Request.class})
     String fatherName;
-    @JsonIgnore
+    @JsonView({Request.class})
+    @NotNull(groups = {Request.class})
+    @Null(groups = {Response.class})
     String personalNumber;
+    @JsonView({Response.class, Request.class})
+    @NotNull
     Date birthdate;
+    @JsonView({Response.class, Request.class})
+    @NotNull(groups = {Response.class, Request.class})
     Status status;
+    @JsonView({Response.class})
+    @NotNull(groups = {Request.class})
+    @Null(groups = {Response.class})
     long role_id;
+    @JsonView({Response.class, Request.class})
+    @NotNull(groups = {Response.class, Request.class})
     String nameRole;
-    @JsonIgnore
+    @JsonView({Request.class})
+    @NotNull(groups = {Request.class})
+    @Null(groups = {Response.class})
     Date createDate;
-    List<Long> cardsAccounts;
+    @JsonView({Response.class, Request.class})
+    @NotNull(groups = {Response.class, Request.class})
+    List<Long> cardAccounts;
 
 }

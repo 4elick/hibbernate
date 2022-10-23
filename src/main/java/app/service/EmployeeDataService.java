@@ -5,7 +5,7 @@ import app.dao.RolesCrudRepository;
 import app.dto.EmployeeDTO;
 import app.entity.Employee;
 import app.entity.Role;
-import app.mapping.MappingEntity;
+import app.mapping.EmployeeMapper;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.HibernateException;
 import org.springframework.data.crossstore.ChangeSetPersister;
@@ -15,12 +15,15 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+
 @Service
 @RequiredArgsConstructor
-public class EmployeeDataService{
-    private final MappingEntity mappingEntity;
+public class EmployeeDataService {
+    private final EmployeeMapper employeeMapper;
     private final EmployeesCrudRepository employeesCrudRepository;
     private final RolesCrudRepository rolesCrudRepository;
+
     /*
     public List<Employee> findByRole(Role role){
         try {
@@ -33,106 +36,74 @@ public class EmployeeDataService{
     }
     */
     @Transactional
-    public void save(Employee employee){
-        try {
+    public void save(EmployeeDTO employeeDTO) {
 
-            if(employeesCrudRepository.existsById(employee.getId())){
-                throw new ChangeSetPersister.NotFoundException();
-            }
+        Employee employee = employeeMapper.convertToEmployee(employeeDTO);
 
-            if(rolesCrudRepository.existsById(employee.getRole().getId())) {
-                Role role = rolesCrudRepository.findById(employee.getRole().getId()).get();
-                employee.setRole(role);
-                role.getEmployees().add(employee);
-            } else {
-                Role role = employee.getRole();
-                role.getEmployees().add(employee);
-                employee.setRole(role);
-            }
-            employeesCrudRepository.save(employee);
-
-        } catch (HibernateException e){
-            e.printStackTrace();
-
-        } catch (ChangeSetPersister.NotFoundException e) {
-            System.out.println("This employee is already exist");
+        if (rolesCrudRepository.existsById(employee.getRole().getId())) {
+            Role role = rolesCrudRepository.findById(employee.getRole().getId()).get();
+            employee.setRole(role);
+            role.getEmployees().add(employee);
+        }else{
+            Role role = employee.getRole();
+            role.getEmployees().add(employee);
+            employee.setRole(role);
         }
-    }
-    @Transactional
-    public void updateEmployee(long id,Employee employee){
-        try {
-            if(!employeesCrudRepository.existsById(id)){
-                throw new ChangeSetPersister.NotFoundException();
-            }
+        employeesCrudRepository.save(employee);
 
-            Employee employee1 = employeesCrudRepository.findById(id).get();
+
+    }
+
+    @Transactional
+    public void updateEmployee(long id, EmployeeDTO employeeDTO) {
+        try {
+            Employee employee1 = employeesCrudRepository.findById(id).orElseThrow(NullPointerException::new);
+            Employee employee = employeeMapper.convertToEmployee(employeeDTO);
             employee1.setName(employee.getName());
             employee1.setFatherName(employee.getFatherName());
             employee1.setSecondName(employee.getSecondName());
 
-            if(rolesCrudRepository.existsById(employee.getRole().getId())) {
+            if (rolesCrudRepository.existsById(employee.getRole().getId())) {
                 Role role = rolesCrudRepository.findById(employee.getRole().getId()).get();
-                employee.setRole(role);
+                employee1.setRole(role);
                 role.getEmployees().add(employee1);
             } else {
                 employee1.setRole(employee.getRole());
             }
             employeesCrudRepository.save(employee1);
 
-        }catch (HibernateException e){
+        } catch (HibernateException e) {
             e.printStackTrace();
-        } catch (ChangeSetPersister.NotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-    @Transactional
-    public EmployeeDTO findById(long id){
-        try {
-            if(!employeesCrudRepository.existsById(id)){
-                throw new ChangeSetPersister.NotFoundException();
-            }
-            Employee employee = employeesCrudRepository.findById(id).get();
-            EmployeeDTO employeeDTO = mappingEntity.convertToEmployeeDTO(employee);
-            return employeeDTO;
-        }catch (HibernateException e){
-            e.printStackTrace();
-            return null;
-        } catch (ChangeSetPersister.NotFoundException e) {
-            e.printStackTrace();
-            return null;
         }
     }
 
     @Transactional
-    public List<Employee> findAll(){
-        List<Employee> employees = new ArrayList<>();
-        try {
-            Iterable<Employee> employeeIterable = employeesCrudRepository.findAll();
-            employeeIterable.forEach(employees ::add);
-        }catch (HibernateException e){
-            e.printStackTrace();
-        }
-        if(!employees.isEmpty()){
-            return employees;
-        } else {
-            System.out.println("Employee's list is empty");
-            return null;
-        }
+    public EmployeeDTO findById(long id) {
+        Employee employee = employeesCrudRepository.findById(id).orElseThrow(NullPointerException::new);
+        return employeeMapper.convertToEmployeeDTO(employee);
     }
+
     @Transactional
-    public void delete(long id){
+    public List<EmployeeDTO> findAll() {
+        List<Employee> employees = employeesCrudRepository.findAll();
+        return employees.stream().map(employeeMapper::convertToEmployeeDTO).collect(toList());
+
+    }
+
+    @Transactional
+    public void delete(long id) {
         try {
             employeesCrudRepository.deleteById(id);
-        }catch (HibernateException e){
+        } catch (HibernateException e) {
             e.printStackTrace();
         }
     }
 
     @Transactional
-    public void deleteAll(){
+    public void deleteAll() {
         try {
             employeesCrudRepository.deleteAll();
-        }catch (HibernateException e){
+        } catch (HibernateException e) {
             e.printStackTrace();
         }
     }

@@ -6,12 +6,12 @@ import app.entity.CardAccount;
 import app.entity.Employee;
 import app.entity.Role;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 @RequiredArgsConstructor
-@Service
-public class MappingEntity {
+@Component
+public class EmployeeMapper {
     private final CardAccountsCrudRepository cardAccountsCrudRepository;
 
     public EmployeeDTO convertToEmployeeDTO(Employee employee){
@@ -20,13 +20,17 @@ public class MappingEntity {
         employeeDTO.setName(employee.getName());
         employeeDTO.setSecondName(employee.getSecondName());
         employeeDTO.setFatherName(employee.getFatherName());
+        employeeDTO.setPersonalNumber(employee.getPersonalNumber());
         employeeDTO.setBirthdate(employee.getBirthdate());
         employeeDTO.setStatus(employee.getStatus());
         employeeDTO.setRole_id(employee.getRole().getId());
         employeeDTO.setNameRole(employee.getRole().getNameRole());
-        employeeDTO.setCardsAccounts(new ArrayList<>());
-        for(CardAccount cardAccount : employee.getCardAccounts()){
-            employeeDTO.getCardsAccounts().add(cardAccount.getId());
+        employeeDTO.setCreateDate(employee.getRole().getCreateDate());
+        employeeDTO.setCardAccounts(new ArrayList<>());
+        if(!employee.getCardAccounts().isEmpty()) {
+            for (CardAccount cardAccount : employee.getCardAccounts()) {
+                employeeDTO.getCardAccounts().add(cardAccount.getId());
+            }
         }
         return employeeDTO;
     }
@@ -41,9 +45,11 @@ public class MappingEntity {
         employee.setPersonalNumber(employeeDTO.getPersonalNumber());
 
         employee.setCardAccounts(new ArrayList<>());
-        for (long id:employeeDTO.getCardsAccounts()){
-            if(cardAccountsCrudRepository.existsById(id)){
-                employee.getCardAccounts().add(cardAccountsCrudRepository.findById(id).get());
+        if(!employeeDTO.getCardAccounts().isEmpty()) {
+            for (long id : employeeDTO.getCardAccounts()) {
+                if (cardAccountsCrudRepository.existsById(id)) {
+                    employee.getCardAccounts().add(cardAccountsCrudRepository.findById(id).get());
+                }
             }
         }
 
@@ -53,6 +59,7 @@ public class MappingEntity {
         role.setCreateDate(employeeDTO.getCreateDate());
         role.setEmployees(new ArrayList<>());
         role.getEmployees().add(employee);
+        employee.setRole(role);
 
         return employee;
 
