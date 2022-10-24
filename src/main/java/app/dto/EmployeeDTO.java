@@ -14,14 +14,6 @@ import java.util.List;
 @NoArgsConstructor
 public class EmployeeDTO {
 
-    public interface Request {
-
-    }
-
-    public interface Response{
-
-    }
-
     @JsonView(Response.class)
     @Null(groups = {Request.class})
     @NotNull(groups = {Response.class})

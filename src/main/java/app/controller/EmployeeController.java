@@ -1,6 +1,8 @@
 package app.controller;
 
 import app.dto.EmployeeDTO;
+import app.dto.Request;
+import app.dto.Response;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,14 +16,14 @@ import app.service.EmployeeDataService;
 public class EmployeeController {
 
     private final EmployeeDataService employeeDataService;
-    @JsonView(EmployeeDTO.Response.class)
+    @JsonView(Response.class)
     @GetMapping(path = "/{id}",produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public EmployeeDTO getEmployee(@PathVariable long id){
         return employeeDataService.findById(id);
     }
 
-    @JsonView(EmployeeDTO.Request.class)
+    @JsonView(Request.class)
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public void addEmployee(@RequestBody EmployeeDTO employee){
@@ -34,6 +36,7 @@ public class EmployeeController {
         employeeDataService.delete(id);
     }
 
+    @JsonView(Request.class)
     @PutMapping(path = "/{id}",produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public void updateEmployee(@PathVariable long id,@RequestBody EmployeeDTO employee){

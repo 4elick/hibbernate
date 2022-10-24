@@ -8,11 +8,9 @@ import app.entity.Role;
 import app.mapping.EmployeeMapper;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.HibernateException;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -38,7 +36,7 @@ public class EmployeeDataService {
     @Transactional
     public void save(EmployeeDTO employeeDTO) {
 
-        Employee employee = employeeMapper.convertToEmployee(employeeDTO);
+        Employee employee = employeeMapper.convertFromDTO(employeeDTO);
 
         if (rolesCrudRepository.existsById(employee.getRole().getId())) {
             Role role = rolesCrudRepository.findById(employee.getRole().getId()).get();
@@ -58,7 +56,7 @@ public class EmployeeDataService {
     public void updateEmployee(long id, EmployeeDTO employeeDTO) {
         try {
             Employee employee1 = employeesCrudRepository.findById(id).orElseThrow(NullPointerException::new);
-            Employee employee = employeeMapper.convertToEmployee(employeeDTO);
+            Employee employee = employeeMapper.convertFromDTO(employeeDTO);
             employee1.setName(employee.getName());
             employee1.setFatherName(employee.getFatherName());
             employee1.setSecondName(employee.getSecondName());
@@ -80,13 +78,13 @@ public class EmployeeDataService {
     @Transactional
     public EmployeeDTO findById(long id) {
         Employee employee = employeesCrudRepository.findById(id).orElseThrow(NullPointerException::new);
-        return employeeMapper.convertToEmployeeDTO(employee);
+        return employeeMapper.convertToDTO(employee);
     }
 
     @Transactional
     public List<EmployeeDTO> findAll() {
         List<Employee> employees = employeesCrudRepository.findAll();
-        return employees.stream().map(employeeMapper::convertToEmployeeDTO).collect(toList());
+        return employees.stream().map(employeeMapper::convertToDTO).collect(toList());
 
     }
 

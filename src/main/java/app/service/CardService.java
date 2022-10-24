@@ -2,8 +2,10 @@ package app.service;
 
 import app.dao.CardAccountsCrudRepository;
 import app.dao.CardsCrudRepository;
+import app.dto.CardDTO;
 import app.entity.Card;
 import app.entity.CardAccount;
+import app.mapping.CardMapper;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.HibernateException;
 import org.springframework.data.crossstore.ChangeSetPersister;
@@ -16,26 +18,21 @@ import javax.transaction.Transactional;
 public class CardService {
     private final CardsCrudRepository cardsCrudRepository;
     private final CardAccountsCrudRepository cardAccountsCrudRepository;
-
+    private final CardMapper cardMapper;
     @Transactional
-    public void save(Card card){
-        try {
+    public void save(CardDTO cardDTO){
+            Card card = cardMapper.convertFromDTO(cardDTO);
             CardAccount cardAccount = cardAccountsCrudRepository.findById(card.getCardAccount().getId()).get();
             cardAccount.getCards().add(card);
             card.setCardAccount(cardAccount);
             cardsCrudRepository.save(card);
 
-        }catch (HibernateException e){
-            e.printStackTrace();
-        }
     }
 
     @Transactional
-    public void update(long id,Card card){
-        try{
-            if(!cardsCrudRepository.existsById(id)){
-                throw new ChangeSetPersister.NotFoundException();
-            }
+    public void update(long id,CardDTO cardDTO){
+
+            Card card = cardMapper.convertFromDTO(cardDTO);
             Card temp = cardsCrudRepository.findById(id).get();
             temp.setName(card.getName());
             temp.setSecondName(card.getSecondName());
@@ -44,41 +41,22 @@ public class CardService {
             temp.setCardAccount(card.getCardAccount());
             card.getCardAccount().getCards().remove(card);
             temp.getCardAccount().getCards().add(temp);
-        }catch (HibernateException e){
-            e.printStackTrace();
-        } catch (ChangeSetPersister.NotFoundException e) {
-            e.printStackTrace();
-        }
+
     }
 
     @Transactional
     public void delete(long id){
-        try {
-            if(!cardsCrudRepository.existsById(id)){
-                throw new ChangeSetPersister.NotFoundException();
-            }
-            cardsCrudRepository.deleteById(id);
-        }catch(HibernateException e){
-            e.printStackTrace();
-        } catch (ChangeSetPersister.NotFoundException e) {
-            e.printStackTrace();
+        if (!cardsCrudRepository.existsById(id)){
+            throw new NullPointerException();
         }
+        cardsCrudRepository.deleteById(id);
     }
 
     @Transactional
-    public Card findById(long id){
-        try {
-            if(!cardsCrudRepository.existsById(id)){
-                throw new ChangeSetPersister.NotFoundException();
-            }
-            Card card = cardsCrudRepository.findById(id).get();
-            return card;
-        }catch (HibernateException e){
-            e.printStackTrace();
-            return null;
-        } catch (ChangeSetPersister.NotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
+    public CardDTO findById(long id){
+
+            Card card = cardsCrudRepository.findById(id).orElseThrow(NullPointerException::new);
+            return cardMapper.convertToDTO(card);
+
     }
 }

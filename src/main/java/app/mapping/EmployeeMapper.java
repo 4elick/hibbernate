@@ -9,12 +9,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+
 @RequiredArgsConstructor
 @Component
 public class EmployeeMapper {
     private final CardAccountsCrudRepository cardAccountsCrudRepository;
 
-    public EmployeeDTO convertToEmployeeDTO(Employee employee){
+    public EmployeeDTO convertToDTO(Employee employee) {
         EmployeeDTO employeeDTO = new EmployeeDTO();
         employeeDTO.setId(employee.getId());
         employeeDTO.setName(employee.getName());
@@ -27,7 +28,7 @@ public class EmployeeMapper {
         employeeDTO.setNameRole(employee.getRole().getNameRole());
         employeeDTO.setCreateDate(employee.getRole().getCreateDate());
         employeeDTO.setCardAccounts(new ArrayList<>());
-        if(!employee.getCardAccounts().isEmpty()) {
+        if (!employee.getCardAccounts().isEmpty()) {
             for (CardAccount cardAccount : employee.getCardAccounts()) {
                 employeeDTO.getCardAccounts().add(cardAccount.getId());
             }
@@ -35,8 +36,9 @@ public class EmployeeMapper {
         return employeeDTO;
     }
 
-    public Employee convertToEmployee(EmployeeDTO employeeDTO){
+    public Employee convertFromDTO(EmployeeDTO employeeDTO) {
         Employee employee = new Employee();
+        employee.setId(employeeDTO.getId());
         employee.setName(employeeDTO.getName());
         employee.setSecondName(employeeDTO.getSecondName());
         employee.setFatherName(employeeDTO.getFatherName());
@@ -45,11 +47,11 @@ public class EmployeeMapper {
         employee.setPersonalNumber(employeeDTO.getPersonalNumber());
 
         employee.setCardAccounts(new ArrayList<>());
-        if(!employeeDTO.getCardAccounts().isEmpty()) {
+        if (!employeeDTO.getCardAccounts().isEmpty()) {
             for (long id : employeeDTO.getCardAccounts()) {
-                if (cardAccountsCrudRepository.existsById(id)) {
-                    employee.getCardAccounts().add(cardAccountsCrudRepository.findById(id).get());
-                }
+
+                employee.getCardAccounts().add(cardAccountsCrudRepository.findById(id).get());
+
             }
         }
 
