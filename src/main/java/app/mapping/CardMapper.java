@@ -1,9 +1,11 @@
 package app.mapping;
 
+import app.configuration.LogicStatusProperties;
 import app.dao.CardAccountsCrudRepository;
 import app.dto.CardDTO;
 import app.entity.Card;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -11,10 +13,13 @@ import org.springframework.stereotype.Component;
 public class CardMapper {
     private final CardAccountMapper cardAccountMapper;
     private final CardAccountsCrudRepository cardAccountsCrudRepository;
+    private final LogicStatusProperties logicStatusProperties;
+
     public CardDTO convertToDTO(Card card) {
         CardDTO cardDTO = new CardDTO();
         cardDTO.setId(card.getId());
-        cardDTO.setLogicStatus(card.getLogicStatus());
+        cardDTO.setLogicStatus(logicStatusProperties.getLogicStatuses().containsKey(card.getLogicStatus())?
+                logicStatusProperties.getLogicStatuses().get(card.getLogicStatus()):logicStatusProperties.getLogicStatuses().get("default-message"));
         cardDTO.setNumber(card.getNumber());
         cardDTO.setName(card.getName());
         cardDTO.setSecondName(card.getSecondName());
