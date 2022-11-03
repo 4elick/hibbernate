@@ -8,21 +8,22 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class CardMapper {
     private final CardAccountMapper cardAccountMapper;
     private final CardAccountsCrudRepository cardAccountsCrudRepository;
-    private final LogicStatusProperties logicStatusProperties;
+    private final LogicStatusMapper logicStatusMapper;
 
     public CardDTO convertToDTO(Card card) {
         CardDTO cardDTO = new CardDTO();
         cardDTO.setId(card.getId());
-        cardDTO.setLogicStatus(logicStatusProperties.getLogicStatuses().containsKey(card.getLogicStatus())?
-                logicStatusProperties.getLogicStatuses().get(card.getLogicStatus()):logicStatusProperties.getLogicStatuses().get("default-message"));
         cardDTO.setNumber(card.getNumber());
         cardDTO.setName(card.getName());
         cardDTO.setSecondName(card.getSecondName());
+        cardDTO.setLogicStatus(logicStatusMapper.convertLogicStatus(card.getLogicStatus()));
         cardDTO.setCardAccountDTO(cardAccountMapper.convertToDTO(card.getCardAccount()));
         return cardDTO;
     }
@@ -37,4 +38,8 @@ public class CardMapper {
         card.setCardAccount(cardAccountsCrudRepository.findById(cardDTO.getCardAccountDTO().getId()).get());
         return card;
     }
+
+    /*public List<CardDTO> convertToDTOList(List<Card> cards){
+
+    }*/
 }

@@ -10,6 +10,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import app.service.EmployeeDataService;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/employees")
@@ -23,6 +25,12 @@ public class EmployeeController {
         return employeeDataService.findById(id);
     }
 
+    @JsonView(Response.class)
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public List<EmployeeDTO> getEmployees(){
+        return employeeDataService.findAll();
+    }
     @JsonView(Request.class)
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)

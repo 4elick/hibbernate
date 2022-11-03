@@ -12,6 +12,8 @@ import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -51,6 +53,12 @@ public class CardService {
         }
         cardsCrudRepository.deleteById(id);
     }
+
+    @Transactional
+    public List<CardDTO> findAll(){
+        return cardsCrudRepository.findAll().stream().map(cardMapper::convertToDTO).collect(Collectors.toList());
+    }
+
 
     @Transactional
     public CardDTO findById(long id){

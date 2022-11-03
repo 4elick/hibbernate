@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/card-accounts/{accountId}/cards")
@@ -22,6 +24,13 @@ public class CardController {
     @ResponseBody
     public CardDTO getCard(@PathVariable long id){
         return cardService.findById(id);
+    }
+
+    @JsonView(Request.class)
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public List<CardDTO> getCards(){
+        return cardService.findAll();
     }
 
     @JsonView(Response.class)
