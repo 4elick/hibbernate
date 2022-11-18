@@ -1,6 +1,7 @@
 package app.controller;
 
 import app.dto.EmployeeDTO;
+import app.dto.FilterDTO;
 import app.dto.Request;
 import app.dto.Response;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -10,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import app.service.EmployeeDataService;
 
+import java.text.ParseException;
 import java.util.List;
 
 @RestController
@@ -18,37 +20,39 @@ import java.util.List;
 public class EmployeeController {
 
     private final EmployeeDataService employeeDataService;
+
     @JsonView(Response.class)
-    @GetMapping(path = "/{id}",produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public EmployeeDTO getEmployee(@PathVariable long id){
+    public EmployeeDTO getEmployee(@PathVariable long id) {
         return employeeDataService.findById(id);
     }
 
     @JsonView(Response.class)
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public List<EmployeeDTO> getEmployees(){
-        return employeeDataService.findAll();
+    public List<EmployeeDTO> getAllOrByFilter(@RequestBody FilterDTO filterDTO) throws ParseException {
+        return employeeDataService.findAllOrByFilter(filterDTO);
     }
+
     @JsonView(Request.class)
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public void addEmployee(@RequestBody EmployeeDTO employee){
+    public void addEmployee(@RequestBody EmployeeDTO employee) {
         employeeDataService.save(employee);
     }
 
-    @DeleteMapping(path = "/{id}",produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteEmployee(@PathVariable long id){
+    public void deleteEmployee(@PathVariable long id) {
         employeeDataService.delete(id);
     }
 
     @JsonView(Request.class)
-    @PutMapping(path = "/{id}",produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public void updateEmployee(@PathVariable long id,@RequestBody EmployeeDTO employee){
-        employeeDataService.updateEmployee(id,employee);
+    public void updateEmployee(@PathVariable long id, @RequestBody EmployeeDTO employee) {
+        employeeDataService.updateEmployee(id, employee);
     }
 
     /*private void adSomeEmployee(String name, String secondName, String fatherName, String personalNumber, Date birthDate, Status status, Role role, List<CardAccount> cardAccounts){

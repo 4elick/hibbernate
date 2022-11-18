@@ -3,6 +3,7 @@ package app.service;
 import app.dao.EmployeesCrudRepository;
 import app.dao.RolesCrudRepository;
 import app.dto.EmployeeDTO;
+import app.dto.FilterDTO;
 import app.entity.Employee;
 import app.entity.Role;
 import app.mapping.EmployeeMapper;
@@ -11,7 +12,12 @@ import org.hibernate.HibernateException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -106,5 +112,10 @@ public class EmployeeDataService {
         }
     }
 
+    @Transactional
+    public List<EmployeeDTO> findAllOrByFilter(FilterDTO filterDTO) throws ParseException {
+    List<Employee> employees = employeesCrudRepository.findAllByFilter(filterDTO.getStatus(), new SimpleDateFormat("yyyy-MM-dd").parse("2022-10-04"));
+    return employees.stream().map(employeeMapper ::convertToDTO).collect(Collectors.toList());
+    }
 
 }
