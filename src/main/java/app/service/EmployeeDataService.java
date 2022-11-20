@@ -7,15 +7,23 @@ import app.dto.FilterDTO;
 import app.entity.Employee;
 import app.entity.Role;
 import app.mapping.EmployeeMapper;
+import liquibase.pro.packaged.E;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.HibernateException;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
-import java.sql.Date;
+import javax.validation.constraints.Pattern;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -114,8 +122,28 @@ public class EmployeeDataService {
 
     @Transactional
     public List<EmployeeDTO> findAllOrByFilter(FilterDTO filterDTO) throws ParseException {
-    List<Employee> employees = employeesCrudRepository.findAllByFilter(filterDTO.getStatus(), new SimpleDateFormat("yyyy-MM-dd").parse("2022-10-04"));
-    return employees.stream().map(employeeMapper ::convertToDTO).collect(Collectors.toList());
+        Specification<Employee> specification = new Specification<Employee>() {
+            @Override
+            public Predicate toPredicate(Root<Employee> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+                List<Predicate> predicates = new ArrayList<Predicate>();
+                if(filterDTO.getBirthdateLessThan() != null && !"".equals(filterDTO.getBirthdateLessThan())){
+                    predicates.add(criteriaBuilder.lessThan(root.get("birthdate"),filterDTO.getBirthdateLessThan()));
+                }
+                if(filterDTO.getBirthdateMoreThan() != null && !"".equals(filterDTO.getBirthdateMoreThan())){
+                    predicates.add(criteriaBuilder.greaterThan(root.get("birthdate"),filterDTO.getBirthdateMoreThan()));
+                }
+                if(filterDTO.getStatus() != null && !"".equals(filterDTO.getStatus())){
+                    predicates.add(criteriaBuilder.equal(root.get("status"),filterDTO.getStatus()));
+                }
+                if(filterDTO.getPersonalNumber() != null && !"".equals(filterDTO.getBirthdateLessThan())){
+
+                    predicates.add(criteriaBuilder.like(root.get("personalNumber"),"%"+ filterDTO.getPersonalNumber()+"%"));
+                }
+                return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
+            }
+        };
+        List<Employee> employees = employeesCrudRepository.findAll(specification);
+        return employees.stream().map(employeeMapper::convertToDTO).collect(toList());
     }
 
 }

@@ -1,8 +1,10 @@
 package app.dao;
 
+import app.dto.FilterDTO;
 import app.entity.Employee;
 import app.entity.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.Temporal;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -16,12 +18,6 @@ import java.util.Date;
 import java.util.List;
 
 @Repository
-public interface EmployeesCrudRepository extends JpaRepository<Employee, Long>{
-
-    @Query(value = "SELECT e FROM Employee e" +
-            "  WHERE ( CAST(:birthdateLessThan AS date) is null or" +
-            "  e.birthdate < :birthdateLessThan) " +
-            " AND (:status is null or :status = e.status)")
-    public List<Employee> findAllByFilter(@Param("status")Status status, /*@Param("birthdateMoreThan") Date birthdateMoreThan,*/ @Param("birthdateLessThan") Date birthdateLessThan);
+public interface EmployeesCrudRepository extends JpaRepository<Employee, Long>, JpaSpecificationExecutor,PagingAndSortingRepository<Employee,Long> {
 
 }
