@@ -27,7 +27,7 @@ public class EmployeeDTO {
     @JsonView({Response.class, Request.class})
     @NotNull(groups = {Response.class, Request.class})
     String fatherName;
-    @JsonView({Request.class})
+    @JsonView({Request.class,Response.class})
     @NotNull(groups = {Request.class})
     @Null(groups = {Response.class})
     String personalNumber;

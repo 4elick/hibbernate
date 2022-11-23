@@ -27,7 +27,7 @@ public class Employee {
     private String secondName;
     @Size(min = 2,max = 255,message = "FatherName is required, maximum 255 characters.")
     private String fatherName;
-    @Size(min = 2,max = 12,message = "PersonalNumber is required, maximum 12 characters.")
+    @Size(min = 1,max = 12,message = "PersonalNumber is required, maximum 12 characters.")
     private String personalNumber;
     @Temporal(TemporalType.DATE)
     private Date birthdate;

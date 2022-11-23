@@ -1,16 +1,31 @@
 package app.service;
 
+import app.dao.EmployeeSpecification;
 import app.dao.EmployeesCrudRepository;
 import app.dao.RolesCrudRepository;
 import app.dto.EmployeeDTO;
+import app.dto.FilterDTO;
 import app.entity.Employee;
 import app.entity.Role;
+import app.entity.Status;
 import app.mapping.EmployeeMapper;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.HibernateException;
+import org.hibernate.query.criteria.internal.CriteriaQueryImpl;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
+import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -106,5 +121,17 @@ public class EmployeeDataService {
         }
     }
 
+    @Transactional
+    public Page<EmployeeDTO> findAllOrByFilter(FilterDTO filterDTO) throws ParseException {
+        EmployeeSpecification specification = new EmployeeSpecification(filterDTO);
+        Page<Employee> employeePage;
+        if(filterDTO.getSortBy() != null && !"".equals(filterDTO.getPersonalNumber())){
+            employeePage = employeesCrudRepository.findAll(specification, PageRequest.of(filterDTO.getPage(), filterDTO.getSize(),Sort.by(filterDTO.getSortBy())));
+        } else  {
+            employeePage = employeesCrudRepository.findAll(specification, PageRequest.of(filterDTO.getPage(), filterDTO.getSize()));
+        }
+        Page<EmployeeDTO> employeeDTOS = employeePage.map(employeeMapper::convertToDTO);
+        return employeeDTOS;
+    }
 
 }
