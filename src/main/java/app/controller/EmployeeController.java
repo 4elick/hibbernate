@@ -4,12 +4,15 @@ import app.dto.EmployeeDTO;
 import app.dto.FilterDTO;
 import app.dto.Request;
 import app.dto.Response;
+import app.entity.Employee;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import app.service.EmployeeDataService;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.text.ParseException;
 import java.util.List;
@@ -23,16 +26,19 @@ public class EmployeeController {
 
     @JsonView(Response.class)
     @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
     public EmployeeDTO getEmployee(@PathVariable long id) {
         return employeeDataService.findById(id);
     }
 
-    @JsonView(Response.class)
+
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public List<EmployeeDTO> getAllOrByFilter(@RequestBody FilterDTO filterDTO) throws ParseException {
-        return employeeDataService.findAllOrByFilter(filterDTO);
+    public Page<EmployeeDTO> getAllOrByFilter(@RequestBody FilterDTO filterDTO) throws ParseException {
+        if(filterDTO.getSize()>100){
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "size is too big, enter size less than 101"
+            );
+        }
+        return  employeeDataService.findAllOrByFilter(filterDTO);
     }
 
     @JsonView(Request.class)

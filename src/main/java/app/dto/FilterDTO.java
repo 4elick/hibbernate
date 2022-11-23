@@ -5,6 +5,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
+import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.List;
 
@@ -14,6 +18,11 @@ public class FilterDTO {
 
     private Date birthdateMoreThan;
     private Date birthdateLessThan;
-    private Status status;
+    private List<Status> status;
     private String personalNumber;
+    private String sortBy;
+    @NotNull
+    private int page;
+    @NotNull
+    private int size;
 }

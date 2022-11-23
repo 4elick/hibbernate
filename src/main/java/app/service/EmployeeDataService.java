@@ -1,15 +1,21 @@
 package app.service;
 
+import app.dao.EmployeeSpecification;
 import app.dao.EmployeesCrudRepository;
 import app.dao.RolesCrudRepository;
 import app.dto.EmployeeDTO;
 import app.dto.FilterDTO;
 import app.entity.Employee;
 import app.entity.Role;
+import app.entity.Status;
 import app.mapping.EmployeeMapper;
-import liquibase.pro.packaged.E;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.HibernateException;
+import org.hibernate.query.criteria.internal.CriteriaQueryImpl;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -18,14 +24,9 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
-import javax.validation.constraints.Pattern;
-import java.sql.Timestamp;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -121,29 +122,16 @@ public class EmployeeDataService {
     }
 
     @Transactional
-    public List<EmployeeDTO> findAllOrByFilter(FilterDTO filterDTO) throws ParseException {
-        Specification<Employee> specification = new Specification<Employee>() {
-            @Override
-            public Predicate toPredicate(Root<Employee> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
-                List<Predicate> predicates = new ArrayList<Predicate>();
-                if(filterDTO.getBirthdateLessThan() != null && !"".equals(filterDTO.getBirthdateLessThan())){
-                    predicates.add(criteriaBuilder.lessThan(root.get("birthdate"),filterDTO.getBirthdateLessThan()));
-                }
-                if(filterDTO.getBirthdateMoreThan() != null && !"".equals(filterDTO.getBirthdateMoreThan())){
-                    predicates.add(criteriaBuilder.greaterThan(root.get("birthdate"),filterDTO.getBirthdateMoreThan()));
-                }
-                if(filterDTO.getStatus() != null && !"".equals(filterDTO.getStatus())){
-                    predicates.add(criteriaBuilder.equal(root.get("status"),filterDTO.getStatus()));
-                }
-                if(filterDTO.getPersonalNumber() != null && !"".equals(filterDTO.getBirthdateLessThan())){
-
-                    predicates.add(criteriaBuilder.like(root.get("personalNumber"),"%"+ filterDTO.getPersonalNumber()+"%"));
-                }
-                return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
-            }
-        };
-        List<Employee> employees = employeesCrudRepository.findAll(specification);
-        return employees.stream().map(employeeMapper::convertToDTO).collect(toList());
+    public Page<EmployeeDTO> findAllOrByFilter(FilterDTO filterDTO) throws ParseException {
+        EmployeeSpecification specification = new EmployeeSpecification(filterDTO);
+        Page<Employee> employeePage;
+        if(filterDTO.getSortBy() != null && !"".equals(filterDTO.getPersonalNumber())){
+            employeePage = employeesCrudRepository.findAll(specification, PageRequest.of(filterDTO.getPage(), filterDTO.getSize(),Sort.by(filterDTO.getSortBy())));
+        } else  {
+            employeePage = employeesCrudRepository.findAll(specification, PageRequest.of(filterDTO.getPage(), filterDTO.getSize()));
+        }
+        Page<EmployeeDTO> employeeDTOS = employeePage.map(employeeMapper::convertToDTO);
+        return employeeDTOS;
     }
 
 }
